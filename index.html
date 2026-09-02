@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cronograma Transpetro 2026 · Administração e Controle · V9 Cloud</title>
+
+
+
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#12294d">
+</head>
+<body>
+
+<header>
+  <div class="dashes"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+  <h1>Cronograma Transpetro 2026 &middot; Administração e Controle</h1>
+  <div class="sub">Edital nº 03 &middot; Banca Cesgranrio &middot; Prova 29/11/2026 &middot; 95 dias de estudo</div>
+</header>
+<div class="cloud-toolbar" id="cloudToolbar">
+  <span class="cloud-status warn" id="cloudStatus">☁ Não conectado</span>
+  <span class="cloud-user" id="cloudUser"></span>
+  <button class="cloud-btn primary" id="cloudLoginBtn">Entrar / Criar conta</button>
+  <button class="cloud-btn danger" id="cloudLogoutBtn" style="display:none">Sair</button>
+</div>
+
+
+<nav class="tabs">
+  <button class="tabbtn active" data-tab="hoje">Hoje</button>
+  <button class="tabbtn" data-tab="cronograma">Cronograma</button>
+  <button class="tabbtn" data-tab="desempenho">Desempenho</button>
+  <button class="tabbtn" data-tab="questoes">Banco de Questões</button>
+  <button class="tabbtn" data-tab="exercicios">Exercícios</button>
+  <button class="tabbtn" data-tab="materiais">Materiais</button>
+  <button class="tabbtn" data-tab="videos">Vídeo-aulas</button>
+</nav>
+
+<main>
+
+
+  <!-- HOJE · SISTEMA DIÁRIO -->
+  <div class="tabpanel active" id="tab-hoje">
+    <div id="todayRoot"></div>
+  </div>
+
+  <!-- DESEMPENHO · INTELIGÊNCIA DE ESTUDO -->
+  <div class="tabpanel" id="tab-desempenho">
+    <h2 class="section">Desempenho & inteligência de estudo</h2>
+    <div class="desc">Acompanhe tempo, questões, acertos, revisões, erros e evolução. Os dados ficam salvos neste navegador e, quando conectado, sincronizados com sua conta na nuvem.</div>
+    <div id="performanceRoot"></div>
+  </div>
+
+  <!-- CRONOGRAMA -->
+  <div class="tabpanel" id="tab-cronograma">
+    <h2 class="section">Cronograma dia a dia</h2>
+    <div class="desc">95 dias, de 26/08/2026 até a véspera da prova. Navegue dia a dia ou pule direto para uma data.</div>
+
+    <div class="statrow">
+      <div class="stat"><div class="num">60</div><div class="lab">Questões</div></div>
+      <div class="stat green"><div class="num">40</div><div class="lab">Específicas</div></div>
+      <div class="stat"><div class="num">10</div><div class="lab">Português</div></div>
+      <div class="stat gold"><div class="num">10</div><div class="lab">Matemática</div></div>
+      <div class="stat"><div class="num">95</div><div class="lab">Dias</div></div>
+    </div>
+
+    <div class="daynav">
+      <button class="navbtn" id="prevBtn">&larr; Anterior</button>
+      <select id="daySelect"></select>
+      <button class="navbtn" id="nextBtn">Próximo &rarr;</button>
+      <button class="navbtn todaybtn" id="todayBtn">Hoje</button>
+      <span style="flex:1;"></span>
+      <button class="navbtn" id="exportBtn" style="background:#4b5563;">Exportar backup</button>
+      <button class="navbtn" id="importBtn" style="background:#4b5563;" title="Aceita backup antigo e backup completo">Importar backup</button>
+      <input type="file" id="importFile" accept="application/json" style="display:none;">
+    </div>
+    <div class="autosave-box"><div id="saveIndicator" class="save-pill"><span class="save-dot"></span><span id="saveStatusText">Salvamento automático ativo</span></div><div class="backup-actions"><button class="smallbtn success" id="quickBackupBtn">Backup agora</button><button class="smallbtn" id="restoreBackupBtn">Recuperar último backup</button><button class="smallbtn danger" id="clearLocalBtn">Apagar dados locais</button></div></div>
+
+    <div class="daycard" id="dayCard"></div>
+
+    <div style="margin-top:20px;">
+      <div class="filterbar">
+        <input type="text" id="searchBox" placeholder="Buscar eixo, tema ou disciplina em todos os dias...">
+      </div>
+      <div style="overflow-x:auto; display:none;" id="searchResultsWrap">
+        <table class="crono" id="cronoTable">
+          <thead><tr><th>Dia</th><th>Data</th><th>Fase</th><th>Bloco Específico</th><th>Bloco Geral</th></tr></thead>
+          <tbody id="cronoBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- BANCO DE QUESTOES -->
+  <div class="tabpanel" id="tab-questoes">
+    <h2 class="section">Banco de Questões</h2>
+    <div class="desc">92 questões autorais, estilo Cesgranrio (objetiva, 5 alternativas), cobrindo os 56 subtemas específicos e Português/Matemática. Nenhum item copiado de prova real.</div>
+
+    <div class="filterbar">
+      <select id="quizGrupoFilter"><option value="">Todos os grupos</option></select>
+      <button class="navbtn" id="quizShuffleBtn" style="background:var(--green);">Questão aleatória</button>
+    </div>
+
+    <div id="quizStats" style="font-size:12px; color:#6b7280; margin-bottom:10px;"></div>
+    <div class="daycard" id="quizCard"></div>
+  </div>
+
+  <!-- EXERCICIOS -->
+  <div class="tabpanel" id="tab-exercicios">
+    <h2 class="section">Exercícios</h2>
+    <div class="desc">Links reais, verificados por busca — nenhum foi inventado. Priorizei fontes gratuitas e provas anteriores da própria Cesgranrio.</div>
+
+    <div class="rescard">
+      <h3>Questões por disciplina (Qconcursos)</h3>
+      <ul>
+        <li><a href="https://www.qconcursos.com/questoes-de-concursos/questoes?discipline_ids%5B%5D=13&examining_board_ids%5B%5D=5" target="_blank">Questões de Matemática &mdash; banca Cesgranrio</a> (filtro pronto, plano grátis permite algumas por dia)</li>
+        <li><a href="https://portuguesemfoco.com/10-questoes-de-portugues-cesgranrio-com-gabarito/" target="_blank">10 questões de Português Cesgranrio, com gabarito</a> (inclui questões de provas antigas da própria Transpetro)</li>
+      </ul>
+    </div>
+
+    <div class="rescard blue">
+      <h3>Provas anteriores da Transpetro (mesma banca)</h3>
+      <ul>
+        <li><a href="https://gabarite.com.br/provas-de-concursos/4553-tecnico-de-administracao-e-controle-junior-transpetro-cesgranrio-2018" target="_blank">Técnico de Administração e Controle Júnior &mdash; Transpetro 2018</a> (o mesmo cargo/ênfase, nível médio &mdash; prova + gabarito oficiais)</li>
+        <li><a href="https://gabarite.com.br/provas-de-concursos/3085-tecnico-de-suprimento-de-bens-e-servicos-junior-transpetro-cesgranrio-2018" target="_blank">Técnico de Suprimento de Bens e Serviços Júnior &mdash; Transpetro 2018</a> (nível médio &mdash; reforço para Compras e Logística)</li>
+        <li><a href="https://gabarite.com.br/provas-de-concursos/1698-administrador-junior-transpetro-cesgranrio-2018" target="_blank">Administrador Júnior &mdash; Transpetro 2018</a> (nível superior, mas útil para RH e Finanças)</li>
+        <li><a href="https://gabarite.com.br/provas-de-concursos/16964-contador-junior-transpetro-cesgranrio-2018" target="_blank">Contador Júnior &mdash; Transpetro 2018</a> (nível superior &mdash; reforço para Finanças e Contabilidade)</li>
+        <li><a href="https://gabarite.com.br/provas-de-concursos/5479-analista-de-comercializacao-e-logistica-junior-comercio-e-suprimento-transpetro-cesgranrio-2018" target="_blank">Analista de Comercialização e Logística Júnior &mdash; Transpetro 2018</a> (nível superior &mdash; reforço para Logística)</li>
+        <li><a href="https://www.qconcursos.com/questoes-de-concursos/provas/cesgranrio-2023-transpetro-profissional-transpetro-de-nivel-superior-junior-enfase-1-administracao/questoes" target="_blank">Transpetro 2023 &mdash; Ênfase 1: Administração (prova completa com questões)</a></li>
+        <li><a href="https://www.qconcursos.com/questoes-de-concursos/provas/cesgranrio-2023-transpetro-tecnico-de-inspecao-de-equipamentos-e-instalacoes/questoes" target="_blank">Transpetro 2023 &mdash; Técnico de Inspeção (nível médio, prova mais recente &mdash; Português/Matemática)</a></li>
+        <li><a href="http://www.cesgranrio.org.br/concursos/principal.aspx" target="_blank">Portal oficial da Fundação Cesgranrio</a> &mdash; concursos anteriores direto na fonte</li>
+      </ul>
+    </div>
+
+    <div class="rescard gold">
+      <h3>Simulados focados na ênfase</h3>
+      <ul>
+        <li><a href="https://www.simuladotranspetro.com.br/cargos/administracao-e-controle" target="_blank">Simulado Concursos &mdash; Administração e Controle Transpetro 2026</a> (questões Cesgranrio/Transpetro de 2008 a 2023, misturadas)</li>
+      </ul>
+    </div>
+
+    <div class="note">Sites como Qconcursos e Simulado Concursos têm plano gratuito limitado (poucas questões/dia) e planos pagos — inclui aqui pela quantidade de questões reais da própria banca, não como recomendação comercial.</div>
+  </div>
+
+  <!-- MATERIAIS -->
+  <div class="tabpanel" id="tab-materiais">
+    <h2 class="section">Materiais de estudo</h2>
+    <div class="desc">Legislação na fonte oficial (Planalto) e o próprio edital — sempre a referência mais confiável.</div>
+
+    <div class="rescard">
+      <h3>Legislação oficial (texto integral, grátis)</h3>
+      <ul>
+        <li><a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2016/lei/l13303.htm" target="_blank">Lei nº 13.303/2016</a> &mdash; Estatuto Jurídico das Estatais (foco: arts. 28 a 91, compras e contratos)</li>
+        <li><a href="http://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/L14133.htm" target="_blank">Lei nº 14.133/2021</a> &mdash; Nova Lei de Licitações e Contratos Administrativos</li>
+        <li><a href="http://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709compilado.htm" target="_blank">Lei nº 13.709/2018 (LGPD)</a> &mdash; texto compilado, com as alterações já incorporadas</li>
+      </ul>
+    </div>
+
+    <div class="rescard blue">
+      <h3>Edital e fonte oficial do concurso</h3>
+      <ul>
+        <li><a href="https://transpetro.com.br/transpetro-institucional/quem-somos/carreiras/concursos/quadro-de-terra.htm" target="_blank">Página oficial Transpetro &mdash; Quadro de Terra</a> (edital, retificações e avisos oficiais)</li>
+        <li><a href="http://www.cesgranrio.org.br/concursos/principal.aspx" target="_blank">Fundação Cesgranrio &mdash; página do concurso</a> (inscrição, cronograma oficial, resultados)</li>
+      </ul>
+    </div>
+
+    <div class="note">Cursos preparatórios pagos (Estratégia Concursos, Focus Concursos, Energia Concursos, Millennium) também têm material específico para essa ênfase, com aulas e apostilas atualizadas pós-edital — não incluí como recomendação, mas existem caso você queira complementar.</div>
+  </div>
+
+  <!-- VIDEOS -->
+  <div class="tabpanel" id="tab-videos">
+    <h2 class="section">Vídeo-aulas</h2>
+    <div class="desc">Vídeos gratuitos no YouTube, encontrados por busca e específicos para este concurso/banca.</div>
+
+    <div class="rescard red">
+      <h3>Visão geral do concurso</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=WgOh8QWL_JI" target="_blank">O que CAI na Prova da Transpetro 2026 (Cesgranrio) e nota para passar</a></li>
+        <li><a href="https://www.youtube.com/watch?v=O-B5hCuk4SQ" target="_blank">Análise do Edital &mdash; Transpetro, banca Cesgranrio</a></li>
+        <li><a href="https://www.youtube.com/watch?v=M2SvTfBfJ1k" target="_blank">Planejamento de estudos para Administração e Controle (nível médio)</a></li>
+      </ul>
+    </div>
+
+    <div class="rescard">
+      <h3>Português (Cesgranrio)</h3>
+      <ul>
+        <li><a href="https://www.youtube.com/watch?v=35TJxHqYV2U" target="_blank">Aula de Português para o concurso Transpetro &mdash; resolução de questões</a></li>
+        <li><a href="https://www.youtube.com/watch?v=gCAO_f_-PXM" target="_blank">Aula de Português &mdash; Crase (Cesgranrio/Transpetro)</a></li>
+        <li><a href="https://www.youtube.com/watch?v=N6XhsBB3lWs" target="_blank">Aula Aberta de Português &mdash; Cesgranrio</a></li>
+      </ul>
+    </div>
+
+    <div class="note">Não encontrei, na busca, vídeo-aulas avulsas e gratuitas específicas para os blocos de Finanças, Logística ou Compras desta ênfase — o que existe de mais direcionado para esses tópicos está nos cursos pagos citados na aba Materiais.</div>
+  </div>
+
+</main>
+
+<footer>Plano de estudos personalizado &middot; gerado a partir do seu cronograma diário</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+
+
+
+
+<style id="v6-enhancements">
+  .official-box{border:1px solid #cfd8e3;background:#f8fafc;border-radius:10px;padding:14px;margin:12px 0 18px}
+  .official-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:10px}
+  .official-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px}
+  .official-card a{font-weight:700;color:var(--navy);text-decoration:none}.official-card a:hover{text-decoration:underline}
+  .source-pill{display:inline-block;font-size:10px;font-weight:700;padding:3px 7px;border-radius:10px;background:#e8eef5;color:#374151;margin-bottom:6px}
+  .cron-checklist{display:grid;gap:8px;margin-top:10px}
+  .cron-task{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:8px;padding:10px;background:#fff;cursor:pointer}
+  .cron-task.done{background:#eef8f2;border-color:#b8dfc8}.cron-task input{margin-top:3px}.cron-task-main{flex:1}.cron-task-title{font-weight:700;font-size:13px}.cron-task-detail{font-size:11.5px;color:#6b7280;margin-top:2px}.cron-task-time{font-size:11px;font-weight:700;color:#6b7280;white-space:nowrap}
+  .cron-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.cron-mini{padding:10px;background:#f8fafc;border:1px solid var(--line);border-radius:8px;text-align:center}.cron-mini strong{display:block;font-size:17px}.cron-mini span{font-size:10px;color:#6b7280}
+  @media(max-width:700px){.cron-summary{grid-template-columns:repeat(2,1fr)}}
+</style>
+
+
+
+<div class="mobile-bottom-nav" id="mobileBottomNav" aria-label="Navegação móvel">
+  <button data-mobile-tab="hoje"><span>🏠</span>Hoje</button>
+  <button data-mobile-tab="cronograma"><span>🗓️</span>Cronograma</button>
+  <button data-mobile-tab="questoes"><span>❓</span>Questões</button>
+  <button data-mobile-tab="desempenho"><span>📊</span>Desempenho</button>
+  <button id="mobileMoreBtn"><span>☰</span>Mais</button>
+</div>
+<div class="mobile-more-panel" id="mobileMorePanel">
+  <button data-mobile-tab="exercicios">✏️ Exercícios</button>
+  <button data-mobile-tab="materiais">📚 Materiais</button>
+  <button data-mobile-tab="videos">🎥 Vídeo-aulas</button>
+  <button data-mobile-tab="passo">🧭 Passo a passo</button>
+</div>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/app.js" defer></script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(console.error));}</script>
+</body>
+</html>
