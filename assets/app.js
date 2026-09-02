@@ -904,7 +904,13 @@ renderToday();renderPerformance();
     const email=$('cloudEmail').value.trim(), password=$('cloudPassword').value;
     if(!email||password.length<6){$('cloudMsg').textContent='Use um e-mail válido e senha com pelo menos 6 caracteres.';return}
     $('cloudMsg').textContent='Criando conta...';
-    const {data,error}=await db.auth.signUp({email,password});
+    const {data,error}=await db.auth.signUp({
+  email,
+  password,
+  options:{
+    emailRedirectTo:"https://kauamaruno.github.io/cronograma-transpetro/"
+  }
+});
     if(error){$('cloudMsg').textContent='Não foi possível criar a conta: '+error.message;return}
     if(data.session){closeModal();await refreshAuth();}
     else $('cloudMsg').textContent='Conta criada. Confira seu e-mail para confirmar a conta e depois entre novamente.';
