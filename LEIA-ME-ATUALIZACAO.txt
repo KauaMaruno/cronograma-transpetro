@@ -1,0 +1,23 @@
+CRONOGRAMA TRANSPETRO — VERSÃO CORRIGIDA
+
+Data da prova: 06/12/2026
+Período exibido: 04/11/2026 a 06/12/2026 (33 dias corridos).
+
+O que mudou:
+- Cronograma refeito para iniciar em 04/11 e terminar no dia da prova.
+- Domingos livres; sábados com rotina reduzida (1h50).
+- Dias úteis até 22/11: 7 horas líquidas.
+- A partir de 23/11: 1h50 por dia, compatível com o retorno ao trabalho.
+- Checklist agora recebe o assunto específico do dia, com etapas de revisão, estudo, questões e correção.
+- Navegação simplificada para Hoje, Cronograma e Desempenho. Banco de questões, exercícios, materiais e vídeos ficam ocultos, mas seus arquivos e dados continuam no projeto.
+- Mantida a integração Supabase e a estrutura de autenticação.
+- Ao abrir pela primeira vez, o progresso diário antigo é arquivado localmente; caderno de erros e estatísticas são preservados.
+
+PUBLICAÇÃO PELO GITHUB WEB:
+1. Baixe e extraia o ZIP.
+2. No repositório GitHub, abra Add file > Upload files.
+3. Envie o conteúdo da pasta (index.html, assets/, sw.js, manifest.webmanifest e README.md), substituindo os arquivos existentes.
+4. Faça Commit changes.
+5. Abra o site e atualize com hard refresh (Ctrl+Shift+R / Cmd+Shift+R).
+
+IMPORTANTE: não apague nem substitua as configurações do projeto Supabase. A chave pública existente foi mantida no app.js.
