@@ -396,6 +396,33 @@ function taskPlan(r){
   ];
 }
 function formatMinutes(min){ if(!min || min<=0) return '—'; const h=Math.floor(min/60), m=min%60; return h ? (m ? `${h}h${String(m).padStart(2,'0')}` : `${h}h`) : `${m} min`; }
+
+function studySchedule(r){
+ if(r.kind==='descanso')return [];
+ if(r.kind==='prova')return [{time:'Conforme cartão de confirmação',title:'Preparação para a prova',detail:'Documentos, trajeto e horário. Sem estudo.'}];
+ if(r.kind==='sabado')return [
+ {time:'09:00–09:10',title:'Revisão programada',detail:'Recuperar os pontos principais sem consultar o material.'},
+ {time:'09:10–09:45',title:r.esp_title,detail:r.esp_text},
+ {time:'09:45–10:10',title:'Questões do assunto específico',detail:'Resolver e corrigir questões do tema principal.'},
+ {time:'10:10–10:30',title:r.geral_title||'Bloco geral',detail:r.geral_text||'Revisão geral curta.'},
+ {time:'10:30–10:40',title:'Correção e caderno de erros',detail:'Registrar erros e regras para revisar.'},
+ {time:'10:40–10:50',title:'Fechamento',detail:'Anotar dificuldade e preparar o próximo estudo.'}];
+ if(r.fase.includes('7H'))return [
+ {time:'08:00–09:30',title:'Conhecimentos específicos · estudo principal',detail:r.esp_title+': '+r.esp_text},
+ {time:'09:45–11:15',title:'Questões de conhecimentos específicos',detail:'Resolver questões Cesgranrio sobre '+r.esp_title+' e corrigir cada alternativa.'},
+ {time:'11:30–12:30',title:'Língua Portuguesa',detail:r.geral_title==='LÍNGUA PORTUGUESA'?r.geral_text:'Prática de Português: interpretação, gramática e questões.'},
+ {time:'14:00–15:00',title:'Matemática',detail:r.geral_title==='MATEMÁTICA'?r.geral_text:'Prática de Matemática: teoria direcionada e exercícios.'},
+ {time:'15:15–16:15',title:'Segundo bloco de conhecimentos específicos',detail:'Aprofundar '+r.esp_title+' ou estudar lacunas identificadas nas questões.'},
+ {time:'16:30–17:30',title:'Revisão espaçada e Caderno de Erros',detail:'Revisar conteúdos anteriores, corrigir erros e responder novamente às questões difíceis.'}];
+ return [
+ {time:'18:45–19:00',title:'Revisão programada',detail:'Recuperar o conteúdo anterior sem consultar o material.'},
+ {time:'19:00–20:00',title:r.esp_title,detail:r.esp_text},
+ {time:'20:00–20:25',title:'Questões do assunto do dia',detail:'Resolver questões e conferir o raciocínio.'},
+ {time:'20:25–20:35',title:'Correção e Caderno de Erros',detail:'Registrar erros, dúvidas e pontos para retomar.'},
+ {time:'20:35–20:45',title:'Fechamento',detail:'Anotar o que ficou difícil e preparar o próximo dia.'}];
+}
+function scheduleHtml(r){const a=studySchedule(r);if(!a.length)return '';return `<div class="panel-card study-schedule"><h3>Horários do estudo</h3><div class="muted">Horários sugeridos; os intervalos não contam como estudo líquido.</div><div class="study-time-list">${a.map(x=>`<div class="study-time-item"><span class="study-time-clock">${esc(x.time)}</span><div><strong>${esc(x.title)}</strong><div class="muted">${esc(x.detail)}</div></div></div>`).join('')}</div></div>`;}
+
 function todayDay(){ return todayIndex(); }
 function fmtTime(sec){sec=Math.max(0,Math.round(sec));const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return h?`${h}h ${String(m).padStart(2,'0')}min`:m?`${m}min ${String(s).padStart(2,'0')}s`:`${s}s`;}
 function dayCompleted(d){const st=dayState(d), tasks=taskPlan(ROWS[d-1]); return tasks.length ? tasks.filter(t=>st.tasks[t[0]]).length/tasks.length : 0;}
@@ -424,6 +451,7 @@ function renderToday(){
   document.getElementById('todayRoot').innerHTML=`
     <div class="daily-hero"><div class="hero-grid"><div><div class="eyebrow">Plano diário · Dia ${d} de ${TOTAL}</div><h2>${esc(r.tipo)}, ${esc(r.data)}</h2><p>${esc(r.fase)} · ${esc(subjectForTask(r))} · ${remaining?remaining+' min estimados restantes':'rotina concluída'}</p><div class="today-actions"><button class="navbtn primary-action" id="startStudyBtn">▶ COMEÇAR ESTUDO</button><button class="navbtn ghost-action" id="focusBtn">Modo foco</button><button class="navbtn ghost-action" id="missedBtn">Não consegui estudar</button></div></div><div class="hero-score"><strong>${pct}%</strong><span>do dia concluído</span></div></div></div>
     ${missed>0?`<div class="panel-card" style="border-left:4px solid var(--gold)"><strong>Recuperação sugerida</strong><div class="muted" style="margin-top:4px">Você tem ${missed} dia(s) marcado(s) como não realizados. A recuperação adiciona uma pequena carga aos próximos dias, sem apagar as revisões programadas.</div></div>`:''}
+    ${scheduleHtml(r)}
     <div class="daily-layout"><div>
       <div class="panel-card"><h3>O que fazer hoje</h3><div class="muted">${done}/${tasks.length} tarefas · ${formatMinutes(remaining)} restantes</div><div class="progress-lg" style="margin-top:10px"><div style="width:${pct}%"></div></div><div class="task-list">${tasks.map(t=>`<label class="task ${st.tasks[t[0]]?'done':''}"><input type="checkbox" data-task="${t[0]}" ${st.tasks[t[0]]?'checked':''}><div><div class="task-title">${esc(t[1])}</div><div class="task-detail">${esc(t[2])}</div></div><span class="task-time">${formatMinutes(t[3])}</span></label>`).join('')}${nextCatch?`<label class="task"><input type="checkbox" data-task="catchup"><div><div class="task-title">Recuperação leve</div><div class="task-detail">20 min para recuperar parte do dia perdido, sem sacrificar a revisão</div></div><span class="task-time">20 min</span></label>`:''}</div></div>
       <div class="panel-card"><h3>Revisões na fila</h3><div class="muted">O sistema transforma 24h, 7d e 21d em tarefas clicáveis.</div><div id="reviewQueue"></div></div>
@@ -772,7 +800,7 @@ renderToday();renderPerformance();
     document.getElementById('daySelect').value=currentDay;document.getElementById('prevBtn').disabled=currentDay===1;document.getElementById('nextBtn').disabled=currentDay===TOTAL;
     const st=dayState(currentDay),tasks=taskPlan(r),done=tasks.filter(t=>st.tasks[t[0]]).length,pct=tasks.length?Math.round(done/tasks.length*100):0;
     let blocksHtml=r.kind==='descanso'||r.kind==='prova'?`<div class="block2 revisao"><h4>${r.kind==='prova'?'Dia da prova':'Descanso programado'}</h4><div class="st">${esc(r.esp_title)}</div><p style="margin:0">${esc(r.esp_text)}</p></div>`:r.kind==='simulado'||r.kind==='revisao_dom'?`<div class="block2 ${r.kind==='simulado'?'simulado':'revisao'}"><h4>${r.kind==='simulado'?'Prova Simulada':'Consolidação'}</h4><div class="st">${esc(r.esp_title)}</div><p style="margin:0">${esc(r.esp_text)}</p></div>`:`<div class="block2 especifico"><h4>Conhecimentos Específicos · Prioridade do dia</h4><div class="st">${esc(r.esp_title)}</div><p style="margin:0">${esc(r.esp_text)}</p></div><div class="block2 geral"><h4>Bloco Geral</h4><div class="st">${esc(r.geral_title||'')}</div><p style="margin:0">${esc(r.geral_text||'')}</p></div>`;
-    document.getElementById('dayCard').innerHTML=`<div class="dayhead-top"><div><span class="daynum2">DIA ${String(r.dia).padStart(2,'0')}</span><span class="badge ${fmtFaseClass(r.fase)}" style="margin-left:8px">${esc(r.fase)}</span></div><div class="daymeta2">${esc(r.tipo)} · ${esc(r.data)}<br>${pct}% concluído</div></div><div class="dayprogress2"><div class="barwrap2"><div class="barfill2" style="width:${pct}%"></div></div></div>${blocksHtml}<div class="block2 revisao"><h4>Revisão programada</h4><p style="margin:0">${esc(r.revisao)}</p></div>
+    document.getElementById('dayCard').innerHTML=`<div class="dayhead-top"><div><span class="daynum2">DIA ${String(r.dia).padStart(2,'0')}</span><span class="badge ${fmtFaseClass(r.fase)}" style="margin-left:8px">${esc(r.fase)}</span></div><div class="daymeta2">${esc(r.tipo)} · ${esc(r.data)}<br>${pct}% concluído</div></div><div class="dayprogress2"><div class="barwrap2"><div class="barfill2" style="width:${pct}%"></div></div></div>${blocksHtml}${scheduleHtml(r)}<div class="block2 revisao"><h4>Revisão programada</h4><p style="margin:0">${esc(r.revisao)}</p></div>
       <div class="desempenho2"><h4>Checklist do dia</h4><div class="muted">Use este bloco como a aba Hoje: marque cada etapa conforme realmente concluir. O progresso é calculado pelas tarefas.</div><div class="cron-checklist">${tasks.map(t=>`<label class="cron-task ${st.tasks[t[0]]?'done':''}"><input type="checkbox" data-crontask="${esc(t[0])}" ${st.tasks[t[0]]?'checked':''}><div class="cron-task-main"><div class="cron-task-title">${esc(t[1])}</div><div class="cron-task-detail">${esc(t[2])}</div></div><span class="cron-task-time">${formatMinutes(t[3])}</span></label>`).join('')}</div>
       <div class="cron-summary"><div class="cron-mini"><strong>${done}/${tasks.length}</strong><span>tarefas</span></div><div class="cron-mini"><strong>${fmtTime(st.seconds||0)}</strong><span>tempo</span></div><div class="cron-mini"><strong>${st.total||0}</strong><span>questões</span></div><div class="cron-mini"><strong>${st.total?Math.round((st.acertos||0)/st.total*100):0}%</strong><span>aproveitamento</span></div></div>
       <div class="fieldrow" style="margin-top:12px">Questões: <input type="number" id="fld-acertos-v6" style="width:60px" min="0" value="${st.acertos||0}"> acertos / <input type="number" id="fld-total-v6" style="width:60px" min="0" value="${st.total||0}"> total</div><div class="fieldrow difrow" id="difrow-v6">Dificuldade percebida: ${[1,2,3,4,5].map(i=>`<span class="difbtn ${st.difficulty===i?'sel':''}" data-v6dif="${i}">${i}</span>`).join('')}</div><div class="fieldrow">Ponto de atenção:</div><textarea class="notas2" id="fld-notas-v6" placeholder="O que ficou difícil? O que revisar amanhã?">${esc(st.notes||'')}</textarea></div>`;
