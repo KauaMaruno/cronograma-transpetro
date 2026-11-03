@@ -21,3 +21,11 @@ PUBLICAÇÃO PELO GITHUB WEB:
 5. Abra o site e atualize com hard refresh (Ctrl+Shift+R / Cmd+Shift+R).
 
 IMPORTANTE: não apague nem substitua as configurações do projeto Supabase. A chave pública existente foi mantida no app.js.
+
+
+ROTINA COM HORÁRIOS (V12)
+- Férias em dias úteis: 08:00–17:30, com intervalos, total de 7h líquidas.
+- Sábados: 09:00–10:50, total de 1h50.
+- Após retorno ao trabalho: 18:45–20:45, total de 1h50.
+- Domingos: descanso integral.
+Os horários aparecem na aba Hoje e também ao abrir cada dia no Cronograma.
